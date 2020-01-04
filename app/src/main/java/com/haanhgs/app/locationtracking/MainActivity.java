@@ -34,12 +34,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "D.MainActivity";
     private static final String TRACKING_KEY = "is_tracking";
 
-    private static final int PERMISSION = 1;
+    private static final int REQUEST_CODE = 1;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int GRANTED = PackageManager.PERMISSION_GRANTED;
 
     private AnimatorSet asRotate;
-
     private FusedLocationProviderClient fusedLocationClient;
     private Location lastLocation;
     private LocationCallback locationCallback;
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTrackingLocation() {
         if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION}, PERMISSION);
+            ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION}, REQUEST_CODE);
         } else {
             isTracking = true;
             fusedLocationClient.requestLocationUpdates(locationRequest(), locationCallback, null);
@@ -78,10 +77,8 @@ public class MainActivity extends AppCompatActivity {
             bnLocation.setText(R.string.start_tracking_location);
             tvLocation.setText(R.string.textview_hint);
             asRotate.end();
-
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -89,8 +86,7 @@ public class MainActivity extends AppCompatActivity {
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case PERMISSION:
-                // If the permission is granted, get the location, otherwise, show a Toast
+            case REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == GRANTED) {
                     startTrackingLocation();
                 } else {
