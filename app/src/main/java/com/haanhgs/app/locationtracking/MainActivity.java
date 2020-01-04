@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
             bnLocation.setText(R.string.start_tracking_location);
             tvLocation.setText(R.string.textview_hint);
             asRotate.end();
+
         }
     }
 
@@ -161,6 +162,10 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.button_location)
     public void onViewClicked() {
-        startTrackingLocation();
+        if (!isTracking){
+            startTrackingLocation();
+        }else {
+            stopTrackingLocation();
+        }
     }
 }
