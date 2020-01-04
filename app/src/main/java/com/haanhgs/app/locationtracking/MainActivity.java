@@ -49,6 +49,48 @@ public class MainActivity extends AppCompatActivity {
         asRotate.setTarget(ivAndroid);
     }
 
+    private void initFuseLocation(){
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+            if (location != null) {
+                tvLocation.setText(getString(R.string.location_text,
+                        location.getLatitude(),
+                        location.getLongitude(),
+                        location.getTime()));
+            } else {
+                tvLocation.setText(getString(R.string.no_location));
+            }
+        });
+    }
+
+    private void initLocationCallback(){
+        locationCallback = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                Repo.getAddress(MainActivity.this, locationResult.getLastLocation())
+                        .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null){
+                        tvLocation.setText(getString(R.string.address_text,
+                                task.getResult(),
+                                System.currentTimeMillis()));
+                    }
+
+                });
+            }
+        };
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        setupAnimatorSet();
+        initFuseLocation();
+        initLocationCallback();
+    }
+
     private LocationRequest locationRequest() {
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setInterval(10000);
@@ -95,48 +137,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
-    }
-
-    private void initFuseLocation(){
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-            if (location != null) {
-                tvLocation.setText(getString(R.string.location_text,
-                        location.getLatitude(),
-                        location.getLongitude(),
-                        location.getTime()));
-            } else {
-                tvLocation.setText(getString(R.string.no_location));
-            }
-        });
-    }
-
-    private void initLocationCallback(){
-        locationCallback = new LocationCallback(){
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                Repo.getAddress(MainActivity.this, locationResult.getLastLocation())
-                        .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null){
-                        tvLocation.setText(getString(R.string.address_text,
-                                task.getResult(),
-                                System.currentTimeMillis()));
-                    }
-
-                });
-            }
-        };
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        setupAnimatorSet();
-        initFuseLocation();
-        initLocationCallback();
     }
 
     @Override
