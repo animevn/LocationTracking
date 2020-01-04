@@ -6,7 +6,6 @@ import android.animation.AnimatorSet;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,8 +13,8 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -115,12 +114,32 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void initLocationCallback(){
+        locationCallback = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                Repo.getAddress(MainActivity.this, locationResult.getLastLocation())
+                        .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null){
+                        tvLocation.setText(getString(R.string.address_text,
+                                task.getResult(),
+                                System.currentTimeMillis()));
+                    }
+
+                });
+            }
+        };
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        setupAnimatorSet();
         initFuseLocation();
+        initLocationCallback();
     }
 
     @Override
