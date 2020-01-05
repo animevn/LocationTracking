@@ -68,15 +68,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                Repo.getAddress(MainActivity.this, locationResult.getLastLocation())
-                        .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null){
-                        tvLocation.setText(getString(R.string.address_text,
-                                task.getResult(),
-                                System.currentTimeMillis()));
-                    }
-
-                });
+                if (isTracking){
+                    Location location = locationResult.getLastLocation();
+                    Repo.getAddress(MainActivity.this, location).addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            tvLocation.setText(getString(R.string.address_text,
+                                    task.getResult(),
+                                    System.currentTimeMillis()));
+                        }
+                    });
+                }
             }
         };
     }
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
             bnLocation.setText(R.string.start_tracking_location);
             tvLocation.setText(R.string.textview_hint);
             asRotate.end();
+            fusedLocationClient.removeLocationUpdates(locationCallback);
         }
     }
 
